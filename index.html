@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>James' Snail Mail Map</title>
+
+  <script src="d3.min.js"></script>
+  <script src="topojson.js"></script>
+  <script src="datamaps.all.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6e73fa;
+      --primary-dark: #3a3f8f;
+      --accent: #f7c873;
+      --bg: #f6f8fb;
+      --card-bg: #fff;
+      --header-bg: rgba(255,255,255,0.75);
+      --header-blur: 12px;
+      --shadow: 0 4px 24px 0 rgba(40,60,120,0.08);
+      --radius: 18px;
+      --text-main: #181a2a;
+      --text-light: #555;
+    }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(120deg, #f6f8fb 0%, #e8eaf6 100%);
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text-main);
+      position: relative;
+      overflow-x: hidden;
+      transition: background 0.8s;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30vh;
+      left: -30vw;
+      width: 160vw;
+      height: 160vh;
+      background: radial-gradient(circle at 70% 20%, #6e73fa33 0%, #f7c87322 60%, transparent 100%);
+      z-index: 0;
+      pointer-events: none;
+      animation: bgmove 16s linear infinite alternate;
+    }
+    @keyframes bgmove {
+      0% { background-position: 70% 20%; }
+      100% { background-position: 30% 80%; }
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--header-bg);
+      backdrop-filter: blur(var(--header-blur));
+      box-shadow: 0 2px 16px 0 rgba(110,115,250,0.07);
+      border-bottom: 1.5px solid #eceffd;
+      text-align: center;
+      padding: 1.5em 0 1em 0;
+      margin-bottom: 32px;
+      transition: background 0.4s;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--primary-dark);
+      margin-bottom: 0.2em;
+      margin-top: 0;
+      text-shadow: 0 2px 12px #6e73fa17;
+    }
+    header h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    .container {
+      width: 95%;
+      max-width: 1100px;
+      margin: 0 auto 48px auto;
+      padding: 0 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .profile-section {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      margin-bottom: 36px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 32px 28px 24px 28px;
+      position: relative;
+      z-index: 2;
+      transition: box-shadow 0.3s;
+    }
+    .profile-section:hover {
+      box-shadow: 0 8px 36px 0 rgba(110,115,250,0.13);
+    }
+    .profile-image-container {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-width: 140px;
+    }
+    .profile-image {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #eceffd;
+      box-shadow: 0 2px 16px rgba(110,115,250,0.09);
+      background: #fff;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .profile-image:hover {
+      transform: scale(1.06) rotate(-2deg);
+      box-shadow: 0 8px 32px rgba(110,115,250,0.16);
+    }
+    .profile-content-blocks {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .content {
+      background: linear-gradient(120deg, #f6f8fb 60%, #e8eaf6 100%);
+      border-radius: 14px;
+      box-shadow: 0 2px 12px 0 rgba(110,115,250,0.07);
+      padding: 22px 20px 18px 20px;
+      margin-top: 0;
+      color: var(--text-light);
+      font-size: 1.07rem;
+      transition: box-shadow 0.3s;
+    }
+    .content h2 {
+      color: var(--primary-dark);
+      font-weight: 700;
+      margin-bottom: 0.3em;
+      margin-top: 0;
+      letter-spacing: 0.5px;
+    }
+    .map-container {
+      width: 100%;
+      margin-top: 32px;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      padding: 0 25px 25px 25px;
+      box-sizing: border-box;
+      position: relative;
+      transition: box-shadow 0.3s;
+      display: block;
+    }
+    .map-container:hover {
+      box-shadow: 0 8px 36px 0 rgba(110,115,250,0.13);
+    }
+    .map-container h2 {
+      margin-top: 36px;
+      margin-bottom: 0;
+      color: var(--primary-dark);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 12px #6e73fa11;
+    }
+    #world-map-container {
+      min-height: 550px;
+    }
+    #usa-map-container {
+      min-height: 675px;
+    }
+    .map-container svg,
+    .datamap {
+      display: block;
+      margin: 0 auto 16px auto;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .datamaps-hoverover {
+      background: var(--primary-dark);
+      color: #fff;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 15px;
+      box-shadow: 0 2px 12px 0 rgba(110,115,250,0.10);
+    }
+    h2 {
+      text-align: center;
+    }
+    @media (max-width: 900px) {
+      .profile-section {
+        flex-direction: column;
+        align-items: center;
+        padding: 22px 8px 18px 8px;
+      }
+      .profile-image {
+        width: 120px;
+        height: 120px;
+      }
+      .container {
+        width: 100%;
+        padding: 0 4px;
+      }
+    }
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+      .profile-section {
+        gap: 16px;
+        padding: 14px 2px 10px 2px;
+      }
+      .profile-image {
+        width: 88px;
+        height: 88px;
+      }
+      .map-container {
+        padding: 0 2vw 16px 2vw;
+      }
+      .map-container h2 {
+        margin-top: 18px;
+        font-size: 1.1rem;
+      }
+    }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    a:hover {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <!-- <h4> www.jamesboucher.co.uk</h4> -->
+    <h1>Snail Mail Map</h1>
+    <h4>Tracking letters and postcards, one country at a time</h4>
+</header>
+
+<div class="container">
+  <div class="profile-section">
+    <div class="profile-image-container">
+      <img src="james_pixar.png" alt="James Boucher" class="profile-image">
+    </div>
+    <div class="profile-content-blocks">
+<!--       <div class="content">
+        <h2>Who?</h2>
+        <p>I'm not quite as old as that avatar implies.</p>
+      </div> -->
+      <div class="content">
+        <h2 style="text-align:left">What?</h2>
+        <p>I'm on a very slow-burn mission to send and receive a letter, card, postcard, parcel, or any other bit of mail to and from every country in the world and state in the US. See how I'm getting on below...</p>
+      </div>
+<!--       <div class="content">
+        <h2>Why?</h2>
+        <p>Why not! In an endlessly fast-paced, online, hyperconnected, increasingly AI-based world, sitting down with a typewriter or pen and writing - unassisted - something nice to another human being then slapping an expensive stamp on it and dropping and dropping it in a red box then hoping it finds its way across the world seems so archaic that it's almost rebellious.</p>
+        <p>Why every country? Because the world is full of interesting people that I will never meet, and this is cheaper and easier than getting on a lot of planes - and better for the planet. </p>
+      </div> -->
+    </div>
+  </div>
+
+  
+  <div id="world-map-container" class="map-container">
+    <h2><br>World</h2>
+  </div>
+
+  <div id="usa-map-container" class="map-container">
+    <h2><br>United States</h2>
+  </div>
+
+</div>
+
+<script>
+// No changes are needed here, the logic was correct. The issue was library incompatibility.
+document.addEventListener('DOMContentLoaded', function() {
+
+  // WORLD MAP CONFIGURATION
+  const sentandreceivedColor = '#299B01';
+  const receivedColor = '#00A2D8';
+  const sentColor = '#FFA500';
+  const worldTravelData = {
+    'GBR': { fillKey: 'Sent & Receivedd' },
+    'USA': { fillKey: 'Sent & Received' },
+    'RUS': { fillKey: 'Sent & Received' },
+    'JPN': { fillKey: 'Sent' },
+    'NZ': { fillKey: 'Sent & Received' }
+  };
+
+  new Datamap({
+    element: document.getElementById('world-map-container'),
+    scope: 'world',
+    fills: {
+      defaultFill: '#dddddd',
+      "Sent & Received": sentandreceivedColor,
+      "Sent": sentColor,
+      "Received": receivedColor
+    },
+    data: worldTravelData,
+    geographyConfig: {
+      borderColor: '#777777',
+      highlightFillColor: '#B4B4B4',
+      highlightBorderColor: '#555555',
+      popupTemplate: function(geography, data) {
+        let status = '';
+        if (data) {
+          status = data.fillKey.charAt(0).toUpperCase() + data.fillKey.slice(1);
+        }
+        return `<strong>${geography.properties.name}</strong><br>${status}`;
+      }
+    }
+  });
+
+  
+
+  // USA MAP CONFIGURATION
+  const visitedStateColor = '#ffc500';
+  const usaTravelData = {
+    'CA': { fillKey: 'Sent & Received' }
+  };
+
+  new Datamap({
+    element: document.getElementById('usa-map-container'),
+    scope: 'usa',
+    fills: {
+      defaultFill: '#dddddd',
+      "Sent & Received": sentandreceivedColor,
+      "Sent": sentColor,
+      "Received": receivedColor
+    },
+    data: usaTravelData,
+    geographyConfig: {
+      borderColor: '#777777',
+      highlightFillColor: '#B4B4B4',
+      highlightBorderColor: '#555555',
+      popupTemplate: function(geography, data) {
+        let status = '';
+        if (data) {
+          status = data.fillKey.charAt(0).toUpperCase() + data.fillKey.slice(1);
+        }
+        return `<strong>${geography.properties.name}</strong><br>${status}`;
+      }
+    }
+  });
+
+});
+</script>
+
+</body>
+</html>

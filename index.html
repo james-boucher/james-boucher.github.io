@@ -33,26 +33,35 @@
       overflow-x: hidden;
       transition: background 0.8s;
     }
-    body::before {
-      content: '';
+    .animated-bg {
       position: fixed;
-      top: -30vh;
-      left: -30vw;
-      width: 160vw;
-      height: 160vh;
-      background: radial-gradient(circle at 70% 20%, #6e73fa33 0%, #f7c87322 60%, transparent 100%);
-      z-index: 0;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
       pointer-events: none;
-      animation: bgmove 16s linear infinite alternate;
+      overflow: hidden;
+      opacity: 0.88;
     }
-    @keyframes bgmove {
-      0% { background-position: 70% 20%; }
-      100% { background-position: 30% 80%; }
+    .animated-bg .waves {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      max-height: 100vh;
+      animation: waveMove 20s linear infinite alternate;
+      will-change: transform;
+      z-index: 0;
+    }
+    @keyframes waveMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100vw); }
     }
     header {
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 1;
       background: var(--header-bg);
       backdrop-filter: blur(var(--header-blur));
       box-shadow: 0 2px 16px 0 rgba(110,115,250,0.07);
@@ -61,6 +70,7 @@
       padding: 1.5em 0 1em 0;
       margin-bottom: 32px;
       transition: background 0.4s;
+      position: relative;
     }
     header h1 {
       font-size: 2.5rem;
@@ -238,6 +248,37 @@
     a:hover {
       color: var(--accent);
     }
+  
+    .footer {
+      width: 100%;
+      background: var(--header-bg);
+      text-align: center;
+      padding: 28px 0 18px 0;
+      margin-top: 38px;
+      border-top: 1.5px solid #eceffd;
+      box-shadow: 0 -2px 16px 0 rgba(110,115,250,0.07);
+      position: relative;
+      z-index: 1;
+      display: block;
+    }
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .footer-text {
+      text-align: center;
+      color: var(--primary-dark);
+      font-size: 1.08rem;
+    }
   </style>
 </head>
 <body>
@@ -290,11 +331,193 @@ document.addEventListener('DOMContentLoaded', function() {
   const receivedColor = '#00A2D8';
   const sentColor = '#FFA500';
   const worldTravelData = {
-    'GBR': { fillKey: 'Sent & Receivedd' },
-    'USA': { fillKey: 'Sent & Received' },
-    'RUS': { fillKey: 'Sent & Received' },
-    'JPN': { fillKey: 'Sent' },
-    'NZ': { fillKey: 'Sent & Received' }
+    // 'AFG': { fillKey: '' }, // Afghanistan
+    // 'ALB': { fillKey: '' }, // Albania
+    // 'DZA': { fillKey: '' }, // Algeria
+    // 'AND': { fillKey: '' }, // Andorra
+    // 'AGO': { fillKey: '' }, // Angola
+    // 'ATG': { fillKey: '' }, // Antigua and Barbuda
+    // 'ARG': { fillKey: '' }, // Argentina
+    // 'ARM': { fillKey: '' }, // Armenia
+    // 'AUS': { fillKey: '' }, // Australia
+    // 'AUT': { fillKey: '' }, // Austria
+    // 'AZE': { fillKey: '' }, // Azerbaijan
+    'BEL': { fillKey: 'Sent & Received' }, // Belgium
+    // 'BEN': { fillKey: '' }, // Benin
+    // 'BTN': { fillKey: '' }, // Bhutan
+    // 'BOL': { fillKey: '' }, // Bolivia
+    // 'BIH': { fillKey: '' }, // Bosnia and Herzegovina
+    // 'BWA': { fillKey: '' }, // Botswana
+    // 'BRA': { fillKey: '' }, // Brazil
+    // 'BRN': { fillKey: '' }, // Brunei
+    // 'BGR': { fillKey: '' }, // Bulgaria
+    // 'BFA': { fillKey: '' }, // Burkina Faso
+    // 'BDI': { fillKey: '' }, // Burundi
+    'CAN': { fillKey: 'Sent & Received' }, // Canada
+    // 'CPV': { fillKey: '' }, // Cape Verde
+    // 'KHM': { fillKey: '' }, // Cambodia
+    // 'CMR': { fillKey: '' }, // Cameroon
+    // 'CAF': { fillKey: '' }, // Central African Republic
+    // 'TCD': { fillKey: '' }, // Chad
+    // 'CHL': { fillKey: '' }, // Chile
+    'CHN': { fillKey: 'Sent' }, // China
+    // 'COL': { fillKey: '' }, // Colombia
+    // 'COM': { fillKey: '' }, // Comoros
+    // 'COG': { fillKey: '' }, // Congo
+    // 'COD': { fillKey: '' }, // Congo (Democratic Republic)
+    // 'CRI': { fillKey: '' }, // Costa Rica
+    // 'CIV': { fillKey: '' }, // Côte d'Ivoire
+    // 'HRV': { fillKey: '' }, // Croatia
+    // 'CUB': { fillKey: '' }, // Cuba
+    // 'CYP': { fillKey: '' }, // Cyprus
+    // 'CZE': { fillKey: '' }, // Czechia
+    'DNK': { fillKey: '' }, // Denmark
+    'DEU': { fillKey: 'Sent & Received' }, // Germany
+    // 'DJI': { fillKey: '' }, // Djibouti
+    // 'DMA': { fillKey: '' }, // Dominica
+    // 'DOM': { fillKey: '' }, // Dominican Republic
+    // 'ECU': { fillKey: '' }, // Ecuador
+    // 'EGY': { fillKey: '' }, // Egypt
+    // 'SLV': { fillKey: '' }, // El Salvador
+    'ESP': { fillKey: 'Sent & Received' }, // Spain
+    // 'EST': { fillKey: '' }, // Estonia
+    // 'SWZ': { fillKey: '' }, // Eswatini
+    // 'ETH': { fillKey: '' }, // Ethiopia
+    'FRA': { fillKey: 'Sent & Received' }, // France
+    // 'GAB': { fillKey: '' }, // Gabon
+    // 'GMB': { fillKey: '' }, // Gambia
+    // 'GEO': { fillKey: '' }, // Georgia
+    'GBR': { fillKey: 'Sent & Received' }, // United Kingdom (includes Northern Ireland)
+    // 'GHA': { fillKey: '' }, // Ghana
+    // 'GRC': { fillKey: '' }, // Greece
+    // 'GRD': { fillKey: '' }, // Grenada
+    // 'GTM': { fillKey: '' }, // Guatemala
+    // 'GIN': { fillKey: '' }, // Guinea
+    // 'GNB': { fillKey: '' }, // Guinea-Bissau
+    // 'GUY': { fillKey: '' }, // Guyana
+    // 'HTI': { fillKey: '' }, // Haiti
+    // 'HND': { fillKey: '' }, // Honduras
+    // 'HUN': { fillKey: '' }, // Hungary
+    'ISL': { fillKey: '' }, // Iceland
+    'IND': { fillKey: '' }, // India
+    'IDN': { fillKey: '' }, // Indonesia
+    'IRN': { fillKey: '' }, // Iran
+    'IRQ': { fillKey: '' }, // Iraq
+    'IRL': { fillKey: 'Sent & Received' }, // Ireland
+    'ISR': { fillKey: '' }, // Israel
+    'ITA': { fillKey: '' }, // Italy
+    'JAM': { fillKey: '' }, // Jamaica
+    'JPN': { fillKey: 'Sent' }, // Japan
+    'JOR': { fillKey: '' }, // Jordan
+    'KAZ': { fillKey: '' }, // Kazakhstan
+    'KEN': { fillKey: '' }, // Kenya
+    'KIR': { fillKey: '' }, // Kiribati
+    'KWT': { fillKey: '' }, // Kuwait
+    'KGZ': { fillKey: '' }, // Kyrgyzstan
+    'LAO': { fillKey: '' }, // Laos
+    'LVA': { fillKey: '' }, // Latvia
+    'LBN': { fillKey: '' }, // Lebanon
+    'LSO': { fillKey: '' }, // Lesotho
+    'LBR': { fillKey: '' }, // Liberia
+    'LBY': { fillKey: '' }, // Libya
+    'LIE': { fillKey: '' }, // Liechtenstein
+    'LTU': { fillKey: 'Sent & Received' }, // Lithuania
+    'LUX': { fillKey: '' }, // Luxembourg
+    'MDG': { fillKey: '' }, // Madagascar
+    'MWI': { fillKey: '' }, // Malawi
+    'MYS': { fillKey: 'Sent & Received' }, // Malaysia
+    'MDV': { fillKey: '' }, // Maldives
+    'MLI': { fillKey: '' }, // Mali
+    'MLT': { fillKey: '' }, // Malta
+    'MHL': { fillKey: '' }, // Marshall Islands
+    'MRT': { fillKey: '' }, // Mauritania
+    'MUS': { fillKey: '' }, // Mauritius
+    'MEX': { fillKey: '' }, // Mexico
+    'FSM': { fillKey: '' }, // Micronesia
+    'MDA': { fillKey: '' }, // Moldova
+    'MCO': { fillKey: '' }, // Monaco
+    'MNG': { fillKey: '' }, // Mongolia
+    'MNE': { fillKey: '' }, // Montenegro
+    'MAR': { fillKey: '' }, // Morocco
+    'MOZ': { fillKey: '' }, // Mozambique
+    'MMR': { fillKey: '' }, // Myanmar
+    'NAM': { fillKey: '' }, // Namibia
+    'NRU': { fillKey: '' }, // Nauru
+    'NPL': { fillKey: '' }, // Nepal
+    'NLD': { fillKey: 'Sent & Received' }, // Netherlands
+    'NZL': { fillKey: 'Sent & Received' }, // New Zealand
+    'NIC': { fillKey: '' }, // Nicaragua
+    'NER': { fillKey: '' }, // Niger
+    'NGA': { fillKey: '' }, // Nigeria
+    'MKD': { fillKey: '' }, // North Macedonia
+    'NOR': { fillKey: '' }, // Norway
+    'OMN': { fillKey: '' }, // Oman
+    'PAK': { fillKey: '' }, // Pakistan
+    'PLW': { fillKey: '' }, // Palau
+    'PSE': { fillKey: '' }, // Palestine
+    'PAN': { fillKey: '' }, // Panama
+    'PNG': { fillKey: '' }, // Papua New Guinea
+    'PRY': { fillKey: '' }, // Paraguay
+    'PER': { fillKey: '' }, // Peru
+    'PHL': { fillKey: '' }, // Philippines
+    'POL': { fillKey: 'Sent & Received' }, // Poland
+    'PRT': { fillKey: '' }, // Portugal
+    'QAT': { fillKey: '' }, // Qatar
+    'ROU': { fillKey: '' }, // Romania
+    'RUS': { fillKey: 'Sent & Received' }, // Russia
+    'RWA': { fillKey: '' }, // Rwanda
+    'KNA': { fillKey: '' }, // Saint Kitts and Nevis
+    'LCA': { fillKey: '' }, // Saint Lucia
+    'VCT': { fillKey: '' }, // Saint Vincent and the Grenadines
+    'WSM': { fillKey: '' }, // Samoa
+    'SMR': { fillKey: '' }, // San Marino
+    'STP': { fillKey: '' }, // Sao Tome and Principe
+    'SAU': { fillKey: '' }, // Saudi Arabia
+    'SEN': { fillKey: '' }, // Senegal
+    'SRB': { fillKey: '' }, // Serbia
+    'SYC': { fillKey: '' }, // Seychelles
+    'SLE': { fillKey: '' }, // Sierra Leone
+    'SGP': { fillKey: '' }, // Singapore
+    'SVK': { fillKey: 'Sent & Received' }, // Slovakia
+    'SVN': { fillKey: '' }, // Slovenia
+    'SLB': { fillKey: '' }, // Solomon Islands
+    'SOM': { fillKey: '' }, // Somalia
+    'ZAF': { fillKey: '' }, // South Africa
+    'KOR': { fillKey: 'Sent & Received' }, // South Korea
+    'SSD': { fillKey: '' }, // South Sudan
+    'ESP': { fillKey: 'Sent & Received' }, // Spain
+    'LKA': { fillKey: '' }, // Sri Lanka
+    'SDN': { fillKey: '' }, // Sudan
+    'SUR': { fillKey: '' }, // Suriname
+    'SWE': { fillKey: 'Sent & Received' }, // Sweden
+    'CHE': { fillKey: 'Received' }, // Switzerland
+    'SYR': { fillKey: '' }, // Syria
+    'TWN': { fillKey: 'Sent & Received' }, // Taiwan
+    'TJK': { fillKey: '' }, // Tajikistan
+    'TZA': { fillKey: '' }, // Tanzania
+    'THA': { fillKey: '' }, // Thailand
+    'TLS': { fillKey: '' }, // Timor-Leste
+    'TGO': { fillKey: '' }, // Togo
+    'TON': { fillKey: '' }, // Tonga
+    'TTO': { fillKey: 'Sent & Received' }, // Trinidad and Tobago
+    'TUN': { fillKey: '' }, // Tunisia
+    'TUR': { fillKey: '' }, // Turkey
+    'TKM': { fillKey: '' }, // Turkmenistan
+    'TUV': { fillKey: '' }, // Tuvalu
+    'UGA': { fillKey: '' }, // Uganda
+    'UKR': { fillKey: 'Received' }, // Ukraine
+    'ARE': { fillKey: '' }, // United Arab Emirates
+    'GBR': { fillKey: 'Sent & Received' }, // United Kingdom
+    'USA': { fillKey: 'Sent & Received' }, // United States
+    'URY': { fillKey: '' }, // Uruguay
+    'UZB': { fillKey: '' }, // Uzbekistan
+    'VUT': { fillKey: '' }, // Vanuatu
+    'VAT': { fillKey: '' }, // Vatican City
+    'VEN': { fillKey: '' }, // Venezuela
+    'VNM': { fillKey: '' }, // Vietnam
+    'YEM': { fillKey: '' }, // Yemen
+    'ZMB': { fillKey: '' }, // Zambia
+    'ZWE': { fillKey: '' } // Zimbabwe
   };
 
   new Datamap({
@@ -326,8 +549,57 @@ document.addEventListener('DOMContentLoaded', function() {
   // USA MAP CONFIGURATION
   const visitedStateColor = '#ffc500';
   const usaTravelData = {
-    'CA': { fillKey: 'Sent & Received' }
+    // 'AL': { fillKey: '' }, // Alabama
+    // 'AK': { fillKey: '' }, // Alaska
+    'AZ': { fillKey: 'Received' }, // Arizona
+    // 'AR': { fillKey: '' }, // Arkansas
+    'CA': { fillKey: 'Sent & Received' }, // California
+    'CO': { fillKey: 'Sent' }, // Colorado
+    // 'CT': { fillKey: '' }, // Connecticut
+    // 'DE': { fillKey: '' }, // Delaware
+    // 'DC': { fillKey: '' }, // District of Columbia
+    'FL': { fillKey: '' }, // Florida
+    // 'GA': { fillKey: '' }, // Georgia
+    'IN': { fillKey: 'Sent & Received' }, // Indiana
+    // 'ID': { fillKey: '' }, // Idaho
+    // 'IL': { fillKey: '' }, // Illinois
+    'MA': { fillKey: 'Sent & Received' }, // Massachusetts
+    'MI': { fillKey: 'Received' }, // Michigan
+    'MN': { fillKey: 'Sent & Received' }, // Minnesota
+    'MO': { fillKey: 'Sent' }, // Missouri
+    'NC': { fillKey: 'Sent & Received' }, // North Carolina
+    'NJ': { fillKey: 'Sent & Received' }, // New Jersey
+    'NM': { fillKey: 'Sent' }, // New Mexico
+    'NY': { fillKey: 'Sent' }, // New York
+    'OR': { fillKey: 'Sent & Received' }, // Oregon
+    // 'ND': { fillKey: '' }, // North Dakota
+    // 'NE': { fillKey: '' }, // Nebraska
+    // 'NH': { fillKey: '' }, // New Hampshire
+    // 'NV': { fillKey: '' }, // Nevada
+    // 'LA': { fillKey: '' }, // Louisiana
+    // 'KY': { fillKey: '' }, // Kentucky
+    // 'MD': { fillKey: '' }, // Maryland
+    // 'ME': { fillKey: '' }, // Maine
+    // 'MS': { fillKey: '' }, // Mississippi
+    // 'MT': { fillKey: '' }, // Montana
+    // 'OK': { fillKey: '' }, // Oklahoma
+    // 'OH': { fillKey: '' }, // Ohio
+    // 'PA': { fillKey: '' }, // Pennsylvania
+    // 'RI': { fillKey: '' }, // Rhode Island
+    // 'SC': { fillKey: '' }, // South Carolina
+    // 'SD': { fillKey: '' }, // South Dakota
+    // 'TN': { fillKey: '' }, // Tennessee
+    'TX': { fillKey: '' }, // Texas
+    'VA': { fillKey: 'Received' }, // Virginia
+    'WA': { fillKey: 'Sent & Received' }, // Washington
+    'WI': { fillKey: 'Sent & Received' } // Wisconsin
+    // 'VT': { fillKey: '' }, // Vermont
+    // 'WV': { fillKey: '' }, // West Virginia
+    // 'UT': { fillKey: '' }, // Utah
+    // 'GA': { fillKey: '' }, // Georgia
+    // 'IA': { fillKey: '' }, // Iowa
   };
+
 
   new Datamap({
     element: document.getElementById('usa-map-container'),
@@ -356,5 +628,36 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="https://github.com/james-boucher" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path fill="#3a3f8f" d="M12 2C6.48 2 2 6.58 2 12.26c0 4.48 2.87 8.28 6.84 9.63.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.1-1.49-1.1-1.49-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.55 2.34 1.1 2.91.84.09-.66.35-1.1.63-1.35-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.38-2.03 1.02-2.75-.1-.26-.44-1.3.1-2.7 0 0 .84-.28 2.75 1.05A9.33 9.33 0 0112 6.84c.85.004 1.71.115 2.51.337 1.91-1.33 2.75-1.05 2.75-1.05.54 1.4.2 2.44.1 2.7.63.72 1.02 1.63 1.02 2.75 0 3.94-2.34 4.81-4.57 5.07.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .26.18.57.69.47C19.14 20.53 22 16.73 22 12.26 22 6.58 17.52 2 12 2z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/jamesboucher/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path fill="#3a3f8f" d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.25c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75c.97 0 1.75.79 1.75 1.75s-.78 1.75-1.75 1.75zm15.5 10.25h-3v-4.5c0-1.07-.02-2.44-1.5-2.44-1.5 0-1.73 1.17-1.73 2.36v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.85-1.54 3.05 0 3.62 2.01 3.62 4.63v4.68z"/></svg>
+        </a>
+        <a href="mailto:hello@jamesboucher.co.uk" aria-label="Email">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path fill="#3a3f8f" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 2v.01L12 13 4 6.01V6h16zm-16 12V8.99l8 6.99 8-6.99V18H4z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/jamesboucheruk" target="_blank" rel="noopener" aria-label="YouTube">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path fill="#3a3f8f" d="M21.8 8.001a2.75 2.75 0 0 0-1.93-1.947C18.13 5.5 12 5.5 12 5.5s-6.13 0-7.87.554A2.75 2.75 0 0 0 2.2 8.001C1.65 9.74 1.65 12 1.65 12s0 2.26.55 3.999a2.75 2.75 0 0 0 1.93 1.947C5.87 18.5 12 18.5 12 18.5s6.13 0 7.87-.554a2.75 2.75 0 0 0 1.93-1.947C22.35 14.26 22.35 12 22.35 12s0-2.26-.55-3.999zM10.5 15.25v-6.5l6 3.25-6 3.25z"/></svg>
+        </a>
+        <a href="https://facebook.com/jamesboucher" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path fill="#3a3f8f" d="M22 12c0-5.522-4.477-10-10-10S2 6.478 2 12c0 5 3.657 9.127 8.438 9.877v-6.987h-2.54v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.261c-1.243 0-1.632.772-1.632 1.562v1.876h2.773l-.443 2.89h-2.33v6.987C18.343 21.127 22 17 22 12z"/></svg>
+        </a>
+        <a href="https://instagram.com/jamesboucher" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path fill="#3a3f8f" d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6zm0 7.8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm6.4-7.92a1.12 1.12 0 1 0 0 2.24 1.12 1.12 0 0 0 0-2.24zM12 2.4c3.2 0 3.584.012 4.85.07 1.17.056 1.97.24 2.43.41a4.8 4.8 0 0 1 1.74 1.14 4.8 4.8 0 0 1 1.14 1.74c.17.46.354 1.26.41 2.43.058 1.266.07 1.65.07 4.85s-.012 3.584-.07 4.85c-.056 1.17-.24 1.97-.41 2.43a4.8 4.8 0 0 1-1.14 1.74 4.8 4.8 0 0 1-1.74 1.14c-.46.17-1.26.354-2.43.41-1.266.058-1.65.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.056-1.97-.24-2.43-.41a4.8 4.8 0 0 1-1.74-1.14 4.8 4.8 0 0 1-1.14-1.74c-.17-.46-.354-1.26-.41-2.43C2.412 15.634 2.4 15.25 2.4 12s.012-3.584.07-4.85c.056-1.17.24-1.97.41-2.43A4.8 4.8 0 0 1 4.02 3.04a4.8 4.8 0 0 1 1.74-1.14c.46-.17 1.26-.354 2.43-.41C8.416 2.412 8.8 2.4 12 2.4zm0-2.4C8.736 0 8.332.012 7.052.07 5.77.128 4.67.312 3.8.54a7.2 7.2 0 0 0-2.6 1.08A7.2 7.2 0 0 0 .54 3.8c-.228.87-.412 1.97-.47 3.252C.012 8.332 0 8.736 0 12c0 3.264.012 3.668.07 4.948.058 1.282.242 2.382.47 3.252a7.2 7.2 0 0 0 1.08 2.6 7.2 7.2 0 0 0 2.6 1.08c.87.228 1.97.412 3.252.47C8.332 23.988 8.736 24 12 24s3.668-.012 4.948-.07c1.282-.058 2.382-.242 3.252-.47a7.2 7.2 0 0 0 2.6-1.08 7.2 7.2 0 0 0 1.08-2.6c.228-.87.412-1.97.47-3.252.058-1.28.07-1.684.07-4.948 0-3.264-.012-3.668-.07-4.948-.058-1.282-.242-2.382-.47-3.252a7.2 7.2 0 0 0-1.08-2.6A7.2 7.2 0 0 0 20.2.54c-.87-.228-1.97-.412-3.252-.47C15.668.012 15.264 0 12 0z"/></svg>
+        </a>
+        <a href="https://x.com/jamesboucher" target="_blank" rel="noopener" aria-label="X">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path fill="#3a3f8f" d="M17.53 2H21l-7.19 8.21L22 22h-7.56l-5.31-6.78L2.47 22H-1l7.62-8.7L2 2h7.56l5.19 6.63L17.53 2zm-2.13 16.99h2.13l-5.63-7.17-2.13 2.42 5.63 7.17zm-8.93-2.42l2.13-2.42-5.63-7.17H2.47l5.63 7.17zm6.8-7.17l-2.13-2.42-5.63 7.17h2.13l5.63-7.17z"/></svg>
+        </a>
+      </div>
+      <div class="footer-text">
+        &copy; 2025 James Boucher &mdash; <a href="https://jamesboucher.co.uk/">jamesboucher.co.uk</a>
+      </div>
+    </div>
+  </footer>
+  
 </body>
 </html>
